@@ -14,20 +14,31 @@ console.log(firebase);
 var database = firebase.database();
 var greetings = database.ref('greetings');
 
-greetings.limitToLast(25).on('child_added', function(greeting) {
-  console.log(greeting);
-  onplant(greeting.val().x, greeting.val().y, greeting.val().text);
-})
+var emojis = [
+  "🦌",
+  "🎄",
+  "🎄",
+  "🎄",
+  "❄️"
+];
 
-function onplant(x, y, message) {
+greetings.limitToLast(50).on('child_added', function(greeting) {
+  console.log(greeting);
+  onplant(greeting.val().x, greeting.val().y, greeting.val().text, greeting.val().icon);
+});
+
+function onplant(x, y, message, icon) {
   var tree = document.createElement('span');
+  tree.setAttribute("class", "emoji-container");
   var m = document.createElement('span');
+  m.setAttribute("class", "emoji-text");
   var i = document.createElement('span');
+  i.setAttribute("class", "emoji-icon");
   m.textContent = message || '';
-  i.textContent = '🎄';
+  i.textContent = icon;
   tree.appendChild(m);
   tree.appendChild(i);
-  tree.style.cssText = `left:${ x * 100 }%; top:${ y * 100 }%`;
+  tree.style.cssText = `left:calc(${ x * 100 }% - 50px); top:calc(${ y * 100 }% - 25px);`;
 	document.body.appendChild(tree);
 }
 
@@ -38,13 +49,14 @@ $(document).click(function(e) {
   var clickX = e.pageX / window.innerWidth;
   var clickY = e.pageY / window.innerHeight;
 
-
+  var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
 
   // Our data object to store inside a database table.
   var data = {
     text: greeting,
     x: clickX,
-    y: clickY
+    y: clickY,
+    icon: randomEmoji
   }
 
   // Push some data into greetings ref.
